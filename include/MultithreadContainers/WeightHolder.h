@@ -1,0 +1,8 @@
+//
+// Created by zhymi on 6/22/2023.
+//
+
+#ifndef ONLINERNN_WEIGHTHOLDER_H
+#define ONLINERNN_WEIGHTHOLDER_H
+
+#endif //ONLINERNN_WEIGHTHOLDER_H
