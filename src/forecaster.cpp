@@ -1,7 +1,8 @@
 #include "forecaster.h"
 
 
-std::tuple<at::Tensor, at::Tensor> runForecaster(
+// todo change this to return results or pipe them out
+int runForecaster(
         ModuleType learner, ModuleType predictor, torch::Tensor data,
         int inputSize, int timeSkip) { // Assume this one will use torch, another might not
     int seqLength, start, end, endIndex;
@@ -28,7 +29,7 @@ std::tuple<at::Tensor, at::Tensor> runForecaster(
             predictorInQueue, learnerInQueue);
     pThread.join();
     lThread.join();
-
+    return 0;
 }
 void make_predictions_torch_pipe(
         ModuleType model, QueueType inputQueue, QueueType outputQueue,
