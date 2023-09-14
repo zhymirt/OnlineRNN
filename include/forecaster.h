@@ -8,10 +8,11 @@
 #include <torch/torch.h>
 #pragma warning(pop)
 
-#include "MultithreadQueue.h" // multithreading queue
+#include "MultithreadContainers/MultithreadQueue.h" // multithreading queue
 #include "constants.h"  // constant values used in code
-#include "RecurrentNNTorch.h"  // Base class for recurrent models used in functions
-#include "StringHolder.h"  // multithreading string holder for model parameters
+#include "CustomModels/RecurrentNNTorch.h"  // Base class for recurrent models used in functions
+#include "MultithreadContainers/StringHolder.h"  // multithreading string holder for model parameters
+#include "MultithreadContainers/WeightHolder.h"  // multithreading weight holder for params and buffers
 
 #if _MSC_VER
 #include <Windows.h>
