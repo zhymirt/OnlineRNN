@@ -6,6 +6,10 @@ int runForecaster(
         ModuleType learner, ModuleType predictor, torch::Tensor data,
         int inputSize, int timeSkip) { // Assume this one will use torch, another might not
     int seqLength, start, end, endIndex;
+    // todo remove these magic numbers!!!
+    start = 0;
+    seqLength = 16;
+    end = timeSkip + (2 * inputSize);
     // instantiate variables
     // get end index
     endIndex = data.size(1) - end;
