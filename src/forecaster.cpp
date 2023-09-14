@@ -50,11 +50,11 @@ void make_predictions_torch_pipe(
     while (!data.equal(constants::queueSentinel)) {  // while data is not sentinel
         ++count;
         // start torch no grad
-		auto [newPrediction, newHidden] = model->predict(data, hidden);
+		std::tie(prediction, hidden) = model->predict(data, hidden);
 //        hidden = newHidden;
-        prediction = newPrediction;
-        hidden = newHidden;
-        // delete newPrediction and newHidden?
+//        prediction = newPrediction;
+//        hidden = newHidden;
+        // delete newPrediction and newHidden? Probably not
         outputQueue->push(prediction);
         if ( paramPipe->newMessage() ) { // todo change this to check for pipe poll
             auto [newParams, newBuffers] = paramPipe->readHolder();
@@ -103,10 +103,10 @@ void make_improvements_torch_pipe(
     int count = 0;
     predictorDone = false;
     updatePredictor = newWeights = true;
-    auto [newData, newActual] = in_queue->front();
+    std::tie(data, actual) = in_queue->front();
     in_queue->pop();
-    data = newData;
-    actual = newActual;
+//    data = newData;
+//    actual = newActual;
     hidden = model->makeHiddenState();
     while ( !data.equal(constants::queueSentinel) && !predictorDone ) {
         auto [prediction, newHidden] = model->predict(data, hidden);
