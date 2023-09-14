@@ -40,7 +40,7 @@ void make_predictions_torch_pipe(
         ModuleType model, QueueType inputQueue, QueueType outputQueue,
         WeightShareType paramPipe) {
     torch::NoGradGuard no_grad;
-    int maxSize = SSIZE_MAX;
+//    int maxSize = SSIZE_MAX;
     int count = 0;
     torch::Tensor data, prediction, hidden;
     // TODO make try catch of all reads and writes
