@@ -16,6 +16,6 @@ public:
 //    virtual torch::OrderedDict<std::string, torch::Tensor> named_buffers(bool recurse = true) = 0;
     virtual std::tuple<torch::Tensor, torch::Tensor> predict(torch::Tensor inputVal, torch::Tensor hiddenState) = 0;
     virtual torch::Tensor loss(torch::Tensor prediction, torch::Tensor actual) = 0;
-    virtual torch::Tensor makeHiddenState() = 0;
+    virtual torch::Tensor makeHiddenState(int batched=0, bool bidirect=false) = 0;
 };
 #endif //ONLINERNN_RECURRENTNNTORCH_H
