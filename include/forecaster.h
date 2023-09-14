@@ -43,10 +43,16 @@ typedef torch::nn::ModuleHolder<torch::nn::MSELossImpl> LossFunction;  // MSE
 typedef std::shared_ptr<torch::optim::Optimizer> OptimizerType;  // Adam or SGD
 
 
+//void make_predictions_torch_pipe(
+//        ModuleType model, QueueType input_queue, QueueType output_queue,
+//        PipeType paramPipe);
 void make_predictions_torch_pipe(
         ModuleType model, QueueType inputQueue, QueueType outputQueue,
         WeightShareType weightHolder);
 //void make_predictions_torch_pipe();
+//void make_improvements_torch_pipe(
+//        ModuleType model, LearnQueueType in_queue, LossFunction loss_fn, int seq_length,
+//        OptimizerType optimizer, PipeType paramPipe, QueueType out_queue);
 void make_improvements_torch_pipe(
         ModuleType model, LearnQueueType in_queue, LossFunction loss_fn, int seq_length,
         OptimizerType optimizer, WeightShareType weightHolder, QueueType out_queue);
