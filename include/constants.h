@@ -22,5 +22,8 @@ namespace constants
 
     const std::string noParams = "";
     const std::string paramSentinel = "NO_MORE_PARAMS";
+
+    const torch::OrderedDict<std::string, torch::Tensor> noDict; // Todo define this
+    const torch::OrderedDict<std::string, torch::Tensor> OrdDictSentinel;
 }
 #endif //ONLINERNN_CONSTANTS_H
