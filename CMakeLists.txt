@@ -20,7 +20,11 @@ add_executable(online_rnn src/main.cpp)
 add_subdirectory(src)
 target_include_directories(online_rnn PUBLIC ${OnlineRNN_SOURCE_DIR}/include/ ${OnlineRNN_SOURCE_DIR}/include/MultithreadContainers/)
 target_link_directories(online_rnn PRIVATE ${OnlineRNN_SOURCE_DIR}/src)
-target_link_libraries(online_rnn "${TORCH_LIBRARIES}" RecurrentNNTorch $<TARGET_OBJECTS:MultithreadContainers>)
+target_link_libraries(online_rnn "${TORCH_LIBRARIES}" forecaster recurrentNNTorch $<TARGET_OBJECTS:MultithreadContainers>)
+# test_online_rnn
+add_executable(test_online_rnn tests/test_forecaster.cpp)
+target_include_directories(test_online_rnn PRIVATE ${OnlineRNN_SOURCE_DIR}/include/ ${OnlineRNN_SOURCE_DIR}/src/Models/)
+target_link_libraries(test_online_rnn forecaster $<TARGET_OBJECTS:myModels>)
 if (MSVC)
     file(GLOB TORCH_DLLS "${TORCH_INSTALL_PREFIX}/lib/*.dll")
     add_custom_command(TARGET online_rnn
