@@ -4,9 +4,10 @@
 
 #ifndef ONLINERNN_RECURRENTNNTORCH_H
 #define ONLINERNN_RECURRENTNNTORCH_H
-//#include <torch/script.h> // One-stop header.
+#pragma warning(push, 0)
 #include <torch/torch.h>
-#include <tuple>
+#pragma warning(pop)
+
 class RecurrentNeuralNetworkTorch : public torch::nn::Module {
 public:
     virtual ~RecurrentNeuralNetworkTorch() {}

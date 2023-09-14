@@ -4,7 +4,9 @@
 #include <iostream> // cout, cin, endl, etc.
 // torch
 //#include <torch/script.h> // One-stop header.
+#pragma warning(push, 0)
 #include <torch/torch.h>
+#pragma warning(pop)
 
 #include "MultithreadQueue.h" // multithreading queue
 #include "constants.h"  // constant values used in code

@@ -6,8 +6,10 @@
 #define ONLINERNN_CONSTANTS_H
 
 #include <limits>
+#pragma warning(push, 0)
 #include <torch/script.h> // One-stop header.
 #include <torch/torch.h>
+#pragma warning(pop)
 
 namespace constants
 {
