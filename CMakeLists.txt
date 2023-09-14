@@ -10,8 +10,12 @@ find_package(Torch REQUIRED)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 
 set(CMAKE_CXX_STANDARD 17)
-
-add_executable(online_rnn src/forecaster.cpp include/forecaster.h)
+# forecaster
+add_library(forecaster src/forecaster.cpp)
+target_include_directories(forecaster PRIVATE include/)
+target_link_libraries(forecaster "${TORCH_LIBRARIES}" recurrentNNTorch $<TARGET_OBJECTS:MultithreadContainers>)
+# online_rnn
+add_executable(online_rnn src/main.cpp)
 #add_library(OnlineRNN library.cpp forecaster.cpp forecaster.h "${TORCH_LIBRARIES}")
 add_subdirectory(src)
 target_include_directories(online_rnn PUBLIC ${OnlineRNN_SOURCE_DIR}/include/ ${OnlineRNN_SOURCE_DIR}/include/MultithreadContainers/)
