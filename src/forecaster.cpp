@@ -112,6 +112,7 @@ void make_improvements_torch_pipe(
     while ( !data.equal(constants::queueSentinel) && !predictorDone ) {
         auto [prediction, newHidden] = model->predict(data, hidden);
         out_queue->push(prediction);
+        hidden = newHidden;
         if (count % seq_length == 0) {
             torch::Tensor loss = loss_fn(prediction, actual);
             optimizer->zero_grad();
@@ -119,8 +120,6 @@ void make_improvements_torch_pipe(
             optimizer->step();
             hidden = model->makeHiddenState();
             newWeights = true;
-        } else {
-            hidden = newHidden;
         }
         // delete data, and actual?
         // doing pipe stuff
