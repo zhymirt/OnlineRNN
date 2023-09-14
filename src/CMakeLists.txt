@@ -1,9 +1,8 @@
 # Recurrent RNN Models
-#include_directories("${OnlineRNN_SOURCE_DIR}/include/CustomModels/")
-add_library(RecurrentNNTorch OBJECT CustomModels/RecurrentNNTorch.cpp)
+add_library(recurrentNNTorch OBJECT ${OnlineRNN_SOURCE_DIR}/src/CustomModels/RecurrentNNTorch.cpp)
 target_include_directories(
-        RecurrentNNTorch PUBLIC ${OnlineRNN_SOURCE_DIR}/include/CustomModels/)
-target_link_libraries(RecurrentNNTorch "${TORCH_LIBRARIES}")
+        recurrentNNTorch PUBLIC ${OnlineRNN_SOURCE_DIR}/include/CustomModels/)
+target_link_libraries(recurrentNNTorch PRIVATE ${TORCH_LIBRARIES})
 # Multithreading containers
 add_library(
         MultithreadContainers OBJECT MultithreadContainers/StringHolder.cpp
