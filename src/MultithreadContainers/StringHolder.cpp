@@ -8,15 +8,15 @@
 #include "StringHolder.h"
 
 
+StringHolder::StringHolder() {
+    this->isNew = false;
+    this->params = constants::noParams;
+}
 std::string StringHolder::getString() { // get string, doesn't use lock
     return this->params;
 }
 void StringHolder::setString(std::string aString) {
     this->params = aString;
-}
-StringHolder::StringHolder() {
-    this->isNew = false;
-    this->params = constants::noParams;
 }
 std::string StringHolder::readString() {  // lock mutex, read string, mark as read
     std::string rString;
