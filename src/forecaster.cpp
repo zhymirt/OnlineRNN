@@ -100,7 +100,8 @@ void make_improvements_torch_pipe(
         OptimizerType optimizer, WeightShareType paramPipe, QueueType out_queue) {
     bool predictorDone, updatePredictor, newWeights;
     torch::Tensor data, actual, hidden;
-    int count = 0;
+    int count;
+    count = 0;
     predictorDone = false;
     updatePredictor = newWeights = true;
     std::tie(data, actual) = in_queue->front();
