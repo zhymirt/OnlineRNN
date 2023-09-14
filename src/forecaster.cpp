@@ -121,6 +121,20 @@ void make_improvements_torch_pipe(
             hidden = model->makeHiddenState();
             newWeights = true;
         }
+        // if predictor has read the last weights, send the next set
+        if ( paramPipe->endUpdates() ) {
+            predictorDone = true;
+        } else if ( !paramPipe->newMessage() ) {
+            updatePredictor = true;
+        }
+        if (newWeights && updatePredictor) {
+            paramPipe->writeHolder(model->named_parameters(), model->named_buffers());
+            newWeights = updatePredictor = false;
+        }
+        std::tie(data, actual) = in_queue->front();
+        in_queue->pop();
+//        data = newData;
+//        actual = newActual;
         // delete data, and actual?
         // doing pipe stuff
         // end pipe stuff
