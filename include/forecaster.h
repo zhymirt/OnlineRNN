@@ -31,7 +31,8 @@ using namespace torch::indexing;
 typedef std::shared_ptr<MultithreadQueue<torch::Tensor>> QueueType;
 typedef std::shared_ptr<MultithreadQueue<std::tuple<torch::Tensor, torch::Tensor>>> LearnQueueType;
 typedef std::shared_ptr<RecurrentNeuralNetworkTorch> ModuleType;
-typedef std::shared_ptr<StringHolder> PipeType;
+typedef std::shared_ptr<WeightHolder> WeightShareType;
+//typedef std::shared_ptr<StringHolder> PipeType;
 //typedef torch::jit::script::Module ModuleType;
 //typedef int PipeType;
 
@@ -42,12 +43,12 @@ typedef std::shared_ptr<torch::optim::Optimizer> OptimizerType;  // Adam or SGD
 
 
 void make_predictions_torch_pipe(
-        ModuleType model, QueueType input_queue, QueueType output_queue,
-        PipeType paramPipe);
+        ModuleType model, QueueType inputQueue, QueueType outputQueue,
+        WeightShareType weightHolder);
 //void make_predictions_torch_pipe();
 void make_improvements_torch_pipe(
         ModuleType model, LearnQueueType in_queue, LossFunction loss_fn, int seq_length,
-        OptimizerType optimizer, PipeType paramPipe, QueueType out_queue);
+        OptimizerType optimizer, WeightShareType weightHolder, QueueType out_queue);
 
 //void make_improvements_torch_pipe(
 //        ModuleType model, LearnQueueType in_queue,LossFunction loss_fn, int seq_length,

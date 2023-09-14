@@ -17,17 +17,18 @@ int runForecaster(
     auto optimizer = std::make_shared<torch::optim::Adam>(learner->parameters());// (learner.parameters());
     QueueType predictorInQueue, predictorOutQueue, learnerOutQueue;
     LearnQueueType learnerInQueue;
-    PipeType paramPipe = std::make_shared<StringHolder>(); // create param pipe as shared_ptr
+//    PipeType paramPipe = std::make_shared<StringHolder>(); // create param pipe as shared_ptr
+    WeightShareType paramShare = std::make_shared<WeightHolder>(); // create param pipe as shared_ptr
     predictorInQueue = std::make_shared<MultithreadQueue<torch::Tensor>>();
     predictorOutQueue = std::make_shared<MultithreadQueue<torch::Tensor>>();
     learnerInQueue = std::make_shared<MultithreadQueue<std::tuple<torch::Tensor, torch::Tensor>>>();
     learnerOutQueue = std::make_shared<MultithreadQueue<torch::Tensor>>();
     std::thread pThread(
             make_predictions_torch_pipe, predictor, predictorInQueue,
-            predictorOutQueue, paramPipe);
+            predictorOutQueue, paramShare);
     std::thread lThread(
             make_improvements_torch_pipe, learner, learnerInQueue, loss_fn,
-            seqLength, optimizer, paramPipe, learnerOutQueue);
+            seqLength, optimizer, paramShare, learnerOutQueue);
     push_data_to_queues(
             data, start, endIndex, timeSkip, inputSize,
             predictorInQueue, learnerInQueue);
@@ -37,11 +38,10 @@ int runForecaster(
 }
 void make_predictions_torch_pipe(
         ModuleType model, QueueType inputQueue, QueueType outputQueue,
-        StringHolder paramPipe) {
+        WeightShareType paramPipe) {
     torch::NoGradGuard no_grad;
     int maxSize = SSIZE_MAX;
     int count = 0;
-    std::string newParams;
     torch::Tensor data, prediction, hidden;
     // TODO make try catch of all reads and writes
     data = inputQueue->front();
@@ -56,9 +56,9 @@ void make_predictions_torch_pipe(
         hidden = newHidden;
         // delete newPrediction and newHidden?
         outputQueue->push(prediction);
-        if ( paramPipe.newMessage() ) { // todo change this to check for pipe poll
-            newParams = paramPipe.readString();
-            update_weights(model, newParams);  // todo need new pipe impl for weights and buffers
+        if ( paramPipe->newMessage() ) { // todo change this to check for pipe poll
+            auto [newParams, newBuffers] = paramPipe->readHolder();
+            update_weights(model, newParams, newBuffers);  // todo need new pipe impl for weights and buffers
             // delete newParams?
             // No need to send pipe confirmation since sender doesn't need to wait
         }
@@ -70,7 +70,8 @@ void make_predictions_torch_pipe(
     // finally
     // delete paramPipe? not shared so idk
     // would need to close queue, but probably just delete?
-}/*
+}
+/*
 void make_predictions_torch_pipe(
         ModuleType model, QueueType inputQueue, QueueType outputQueue,
         int *pipe) {
@@ -96,7 +97,7 @@ void make_predictions_torch_pipe(
 
 void make_improvements_torch_pipe(
         ModuleType model, LearnQueueType in_queue, LossFunction loss_fn, int seq_length,
-        OptimizerType optimizer, PipeType paramPipe, QueueType out_queue) {
+        OptimizerType optimizer, WeightShareType paramPipe, QueueType out_queue) {
     bool predictorDone, updatePredictor, newWeights;
     torch::Tensor data, actual, hidden;
     int count = 0;
