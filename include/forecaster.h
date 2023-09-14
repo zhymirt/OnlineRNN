@@ -59,8 +59,11 @@ void push_data_to_queues(
         const torch::Tensor &data, int start, int endIndex,int time_skip,
         int input_size, QueueType currQueue, LearnQueueType histQueue);
 void update_weights(
-        ModuleType model, torch::OrderedDict<std::string, torch::Tensor> params,
+        RecurrentNeuralNetworkTorch& model, torch::OrderedDict<std::string, torch::Tensor> params,
         torch::OrderedDict<std::string, torch::Tensor> buffers);
+void update_weights(
+        ModuleType model, const torch::OrderedDict<std::string, torch::Tensor>& params,
+        const torch::OrderedDict<std::string, torch::Tensor>& buffers);
 void torch_update_state(ModuleType model, std::stringstream& new_state);
 void push_data_to_pipes(torch::Tensor data, int start,
 		int end_index, int time_skip, int input_size, int curr_pipe, int hist_pipe);

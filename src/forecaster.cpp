@@ -135,23 +135,21 @@ void make_improvements_torch_pipe(
 //        OptimizerType optimizer, PipeType paramPipe);
 
 void update_weights(
-        ModuleType model, torch::OrderedDict<std::string, torch::Tensor> params,
-        torch::OrderedDict<std::string, torch::Tensor> buffers) {
-    // no way this is allowed
-//    model->named_parameters() = params;
-//    model->named_buffers() = buffers;
-// actual attempt here
-    assert(model->named_parameters() == params.size());  // assert same number of key/value pairs
-    assert(model->named_buffers() == buffers.size());  // assert same number of key/value pairs
+        ModuleType model,const torch::OrderedDict<std::string, torch::Tensor>& params,
+        const torch::OrderedDict<std::string, torch::Tensor>& buffers) {
+    torch::NoGradGuard noGrad;
+    torch::OrderedDict<std::string, torch::Tensor> modelParams, modelBuffers;
+    modelParams = model->named_parameters();
+    modelBuffers = model->named_buffers();
     // iterate and modify all named_parameters
-    for (std::string key : model->named_parameters().keys()) {
-        assert(params.find(key) != null_ptr);
-        model->named_parameters()[key] = *params.find(key);
+    for (const auto& pair : params) {
+        auto* pItem = modelParams.find(pair.key());
+        pItem->copy_(pair.value());
     }
     // iterate and modify all named_buffers
-    for (std::string key : model->named_buffers().keys()) {
-        assert(buffers.find(key) != null_ptr);
-        model->named_buffers()[key] = *buffers.find(key);
+    for (const auto& pair : buffers) {
+        auto* bItem = modelBuffers.find(pair.key());
+        bItem->copy_(pair.value());
     }
 }
 //void torch_update_state(ModuleType model, std::stringstream new_state) {
