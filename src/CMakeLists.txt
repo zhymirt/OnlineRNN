@@ -7,7 +7,7 @@ target_link_libraries(recurrentNNTorch PRIVATE ${TORCH_LIBRARIES})
 add_library(
         MultithreadContainers OBJECT MultithreadContainers/StringHolder.cpp
         ${OnlineRNN_SOURCE_DIR}/include/MultithreadContainers/MultithreadQueue.h
-        ${OnlineRNN_SOURCE_DIR}/include/constants.h ../include/MultithreadContainers/WeightHolder.h)
+        ${OnlineRNN_SOURCE_DIR}/include/constants.h MultithreadContainers/WeightHolder.cpp)
 target_include_directories(
         MultithreadContainers PRIVATE ${OnlineRNN_SOURCE_DIR}/include/MultithreadContainers/
         PRIVATE ${OnlineRNN_SOURCE_DIR}/include/)
