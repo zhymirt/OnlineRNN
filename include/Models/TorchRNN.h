@@ -9,17 +9,13 @@
 #include <torch/torch.h>
 #pragma warning(pop)
 
-#include "RecurrentNNTorch.h"
-//#include "CustomModels/RecurrentNNTorch.h"
+#include "CustomModels/RecurrentNNTorch.h"
 
 namespace TorchModels {
 
     class TorchRNN : public RecurrentNeuralNetworkTorch {
     private:
         torch::Dtype dtype;
-    public:
-
-    private:
         int inputLength, hiddenFeatures, numLayers;
         torch::Tensor hiddenState;
         torch::nn::RNN rnn{nullptr};

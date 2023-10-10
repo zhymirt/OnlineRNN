@@ -2,14 +2,14 @@
 // Created by zhymi on 8/30/2023.
 //
 
-#include "TorchRNN.h"
+#include "Models/TorchRNN.h"
 
 namespace TorchModels {
     TorchRNN::TorchRNN() {
         // magic numbers for default constructor
         this->setInputLength(1);
         this->setNumLayers(1);
-        this->setHiddenFeatures(64); // magic number; should remove
+        this->setHiddenFeatures(1); // magic number; should remove
         this->setDtype(torch::kFloat32);
         // end magic numbers for default constructor
         this->rnn = register_module(
@@ -28,22 +28,37 @@ namespace TorchModels {
     TorchRNN::TorchRNN(int histLength, int numLayers, torch::Dtype dataType) {
         this->setInputLength(histLength);
         this->setNumLayers(numLayers);
-        this->setHiddenFeatures(64); // magic number; should remove
+        this->setHiddenFeatures(1); // magic number; should remove
         this->setDtype(dataType);
+//        this->setHiddenFeatures(20);
+//        this->rnn = register_module(
+//                "rnn", torch::nn::RNN(
+//                        torch::nn::RNNOptions(histLength, 20).num_layers(this->getNumLayers())
+//                        ));
         this->rnn = register_module(
                 "rnn", torch::nn::RNN(
                         torch::nn::RNNOptions(
-                                this->getInputLength(), this->getHiddenFeatures())
+                                histLength, this->getHiddenFeatures())
                                 .num_layers(this->getNumLayers()).batch_first(true)
                                 .bias(false).nonlinearity(torch::kTanh)));
         this->lastLayer = register_module(
                 "fcc1", torch::nn::Linear(
                         torch::nn::LinearOptions(
-                                this->getHiddenFeatures(), 1).bias(false)));
+                                this->getInputLength(), this->getInputLength()).bias(false)));
+//        this->lastLayer = register_module(
+//                "fcc1", torch::nn::Linear(
+//                        torch::nn::LinearOptions(
+//                                this->getHiddenFeatures(), 1).bias(false)));
 
     }
 
     std::tuple<torch::Tensor, torch::Tensor> TorchRNN::forward(torch::Tensor inputVal, torch::Tensor hidden) {
+        if ( inputVal.size(1) != this->getHiddenFeatures() && inputVal.size(2) != this->getInputLength())
+            throw std::runtime_error("Input value dimensions do match model dimensions.");
+        if ( hidden.dim() != 3 )
+            throw std::runtime_error("Hidden must have 3 dimension with second being batch size.");
+        if ( inputVal.size(0) != hidden.size(1))  // assumes model is batch first
+            throw std::runtime_error("Input val and hidden have different batch sizes.");
         std::tuple<torch::Tensor, torch::Tensor> out = this->rnn->forward(inputVal, hidden);
         return out;
     }
