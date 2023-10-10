@@ -46,25 +46,28 @@ void make_predictions_torch_pipe(
     // TODO make try catch of all reads and writes
     data = inputQueue->front();
     inputQueue->pop();
-    hidden = model->makeHiddenState(); // TODO Make these classes
+    // model needs hidden and data to be batched, magic number here to make batch size 1
+    hidden = model->makeHiddenState(1); // TODO Make these classes
     while (!data.equal(constants::queueSentinel)) {  // while data is not sentinel
+        std::cout << "Predictions loop #: " << count << std::endl;
         ++count;
-        // start torch no grad
 		std::tie(prediction, hidden) = model->predict(data, hidden);
-//        hidden = newHidden;
-//        prediction = newPrediction;
-//        hidden = newHidden;
-        // delete newPrediction and newHidden? Probably not
         outputQueue->push(prediction);
+//        std::cout << "Prediction pushed to queue" << std::endl;
         if ( paramPipe->newMessage() ) { // todo change this to check for pipe poll
             auto [newParams, newBuffers] = paramPipe->readHolder();
-            update_weights(model, newParams, newBuffers);  // todo need new pipe impl for weights and buffers
+            // check if there are new values to update with
+            if (constants::noDict.keys() != newParams.keys() && newBuffers.keys() != constants::noDict.keys())
+                update_weights(model, newParams, newBuffers);
             // delete newParams?
             // No need to send pipe confirmation since sender doesn't need to wait
         }
+//        std::cout << "Update weight functions complete" << std::endl;
+        // todo if container is empty, front() has undefined behavior and pop won't work
         data = inputQueue->front();
         inputQueue->pop();
     }
+    std::cout << "Loop complete" << std::endl;
     // delete data
     outputQueue->push(constants::queueSentinel);
     // finally
@@ -99,8 +102,9 @@ void make_improvements_torch_pipe(
         ModuleType model, LearnQueueType in_queue, LossFunction loss_fn, int seq_length,
         OptimizerType optimizer, WeightShareType paramPipe, QueueType out_queue) {
     bool predictorDone, updatePredictor, newWeights;
-    torch::Tensor data, actual, hidden;
-    int count;
+    torch::Tensor data, actual, prediction, hidden;
+    int count, batchSize;
+    batchSize = 1;
     count = 0;
     predictorDone = false;
     updatePredictor = newWeights = true;
@@ -108,17 +112,16 @@ void make_improvements_torch_pipe(
     in_queue->pop();
 //    data = newData;
 //    actual = newActual;
-    hidden = model->makeHiddenState();
+    hidden = model->makeHiddenState(batchSize);
     while ( !data.equal(constants::queueSentinel) && !predictorDone ) {
-        auto [prediction, newHidden] = model->predict(data, hidden);
+        std::tie(prediction, hidden) = model->predict(data, hidden);
         out_queue->push(prediction);
-        hidden = newHidden;
         if (count % seq_length == 0) {
             torch::Tensor loss = loss_fn(prediction, actual);
             optimizer->zero_grad();
             loss.backward();
             optimizer->step();
-            hidden = model->makeHiddenState();
+            hidden = model->makeHiddenState(batchSize);
             newWeights = true;
         }
         // if predictor has read the last weights, send the next set
