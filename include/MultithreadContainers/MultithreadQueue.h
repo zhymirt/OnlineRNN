@@ -11,10 +11,9 @@
 template <typename T> class MultithreadQueue {
 private:
     std::mutex queueMutex;
-    std::queue<T> queue;
+    std::queue<T, std::deque<T>> queue;
 public:
     MultithreadQueue() {
-        this->queue = std::queue<T>();
     }
     void push(T item) {
         std::lock_guard<std::mutex> lock(this->queueMutex);
