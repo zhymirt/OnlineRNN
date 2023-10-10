@@ -1,20 +1,27 @@
+find_package(Torch REQUIRED)
+# forecaster
+add_library(forecaster forecaster.cpp)
+target_include_directories(forecaster PRIVATE ${OnlineRNN_SOURCE_DIR}/include/)
+target_link_libraries(forecaster ${TORCH_LIBRARIES} recurrentNNTorch MultithreadContainers)
+
+
 # Recurrent RNN Models
-add_library(recurrentNNTorch OBJECT ${OnlineRNN_SOURCE_DIR}/src/CustomModels/RecurrentNNTorch.cpp)
+add_library(recurrentNNTorch CustomModels/RecurrentNNTorch.cpp)
 target_include_directories(
-        recurrentNNTorch PUBLIC ${OnlineRNN_SOURCE_DIR}/include/CustomModels/)
+        recurrentNNTorch PUBLIC ${OnlineRNN_SOURCE_DIR}/include/)
 target_link_libraries(recurrentNNTorch PRIVATE ${TORCH_LIBRARIES})
+
 # Multithreading containers
 add_library(
-        MultithreadContainers OBJECT MultithreadContainers/StringHolder.cpp
+        MultithreadContainers MultithreadContainers/StringHolder.cpp
         ${OnlineRNN_SOURCE_DIR}/include/MultithreadContainers/MultithreadQueue.h
         ${OnlineRNN_SOURCE_DIR}/include/constants.h MultithreadContainers/WeightHolder.cpp)
 target_include_directories(
-        MultithreadContainers PRIVATE ${OnlineRNN_SOURCE_DIR}/include/MultithreadContainers/
-        PRIVATE ${OnlineRNN_SOURCE_DIR}/include/)
-target_link_libraries(MultithreadContainers PUBLIC ${TORCH_LIBRARIES})
+        MultithreadContainers PUBLIC ${OnlineRNN_SOURCE_DIR}/include/MultithreadContainers/
+        PUBLIC ${OnlineRNN_SOURCE_DIR}/include/)
+target_link_libraries(MultithreadContainers PRIVATE ${TORCH_LIBRARIES})
+
 # Models
-add_library(myModels OBJECT ${OnlineRNN_SOURCE_DIR}/src/Models/TorchRNN.cpp)
-
-target_include_directories(myModels PRIVATE ${OnlineRNN_SOURCE_DIR}/include/ PRIVATE C:/Users/zhymi/cpp_work/OnlineRNN/include/CustomModels)
-
-target_link_libraries(myModels ${TORCH_LIBRARIES} OBJECT $<TARGET_OBJECTS:recurrentNNTorch>)
+add_library(myModels Models/TorchRNN.cpp Models/TorchMLP.cpp)
+target_include_directories(myModels PUBLIC ${OnlineRNN_SOURCE_DIR}/include/CustomModels/ PUBLIC ${OnlineRNN_SOURCE_DIR}/include)
+target_link_libraries(myModels PRIVATE ${TORCH_LIBRARIES} PUBLIC recurrentNNTorch)
