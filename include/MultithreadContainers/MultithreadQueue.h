@@ -36,11 +36,11 @@ public:
         std::lock_guard<std::mutex> lock(this->queueMutex);
         return this->queue.empty();
     }
-    ~MultithreadQueue() {  // finish the destructor
-//        std::lock_guard<std::mutex> unlock;
-        delete &this->queueMutex;
-        this->queue = {};
-    }
+//    ~MultithreadQueue() {  // finish the destructor
+////        std::lock_guard<std::mutex> unlock;
+////        delete &this->queueMutex;
+//        this->queue = {};
+//    }
 };
 //#include "MultithreadQueue.ipp"
 
