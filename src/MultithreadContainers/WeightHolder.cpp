@@ -16,6 +16,13 @@ regType WeightHolder::getParams() {
 regType WeightHolder::getBuffers() {
     return this->buffers;
 }
+bool WeightHolder::getIsNew() {
+    return this->isNew;
+}
+
+bool WeightHolder::getIsDone() {
+    return this->isDone;
+}
 
 void WeightHolder::setParams(regType otherParams) {
     this->params = otherParams;
@@ -24,17 +31,26 @@ void WeightHolder::setBuffers(regType otherBuffers) {
     this->buffers = otherBuffers;
 }
 
+void WeightHolder::setIsDone(bool setIsDone) {
+    this->isDone = setIsDone;
+}
+
+void WeightHolder::setIsNew(bool setIsNew) {
+    this->isNew = setIsNew;
+}
+
 std::tuple<regType, regType> WeightHolder::readHolder() {
-    regType newBuffers, newParams;
+    regType newParams, newBuffers;
     std::lock_guard<std::mutex> lock(this->mtx);
     if ( this->isNew ) {
-        newBuffers = this->getBuffers();
         newParams = this->getParams();
+        newBuffers = this->getBuffers();
         this->isNew = false;
-    } else{
-        newBuffers = newParams = constants::noDict;
+    } else {
+        newParams = newBuffers = constants::noDict;
     }
-    return std::tuple<regType, regType>(newBuffers, newParams);
+    // order of tuple is parameters then buffers
+    return std::tuple<regType, regType>(newParams, newBuffers);
 }
 void WeightHolder::writeHolder(regType otherParams, regType otherBuffers) {
     std::lock_guard<std::mutex> lock(this->mtx);
